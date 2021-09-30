@@ -179,18 +179,74 @@ namespace RPN_App.ReversePolishNote
                         value += ")"; 
                         stack.Push(value.ToString());
                     }
+                    else if(arr[i] == "*" || arr[i] == "/" )
+                    {
+                        num2 = stack.Pop();
+                        num1 = stack.Pop();
+                        value = BracketOpener(num1, num2, arr[i]);
+                        stack.Push(value);
+                    }
                     else
                     {
                         num2 = stack.Pop();
                         num1 = stack.Pop();
                         value = '(' + num1 + arr[i] + num2 + ')';
-                        stack.Push(value.ToString());
+                        stack.Push(value);
                     }
                 }
             }
-            return stack.Pop();
+            value = stack.Pop();
+            if(!value.Contains('*') && !value.Contains('/'))
+            {
+                string new_res = "";
+                for(int i = 0; i < value.Length; i++)
+                {
+                    if(value[i] != '(' && value[i] != ')')
+                    {
+                        new_res += value[i];
+                    }
+                }
+                value = new_res;
+            }
+            return value;
         }
 
+        public string BracketOpener(string num1, string num2, string operation)
+        {
+            string result = "";
+            if(num1[0] == '(')
+            {
+                string sub_str = num1.Substring(1, num1.Length - 2);
+                string[] val_list = sub_str.Split("+");
+                if(val_list != null && val_list.Length > 0)
+                {
+                    if(num2[0] == '(')
+                    {
+                        Console.WriteLine("Make method for multipling to bracket expresions");
+                    }
+                    else
+                    {
+                        string oper = "";
+                        if (operation == "/")
+                        {
+                            oper = "^_1";
+                        }
+                        result += num2 + oper + val_list[0];
+                        for (int j = 1; j < val_list.Length; j++)
+                        {
+                            result += "+" + num2 + oper + val_list[j];
+                        }
+                    }
+                } else
+                {
+                    Console.WriteLine("BracketOpener: Error val list is null or empty!!!");
+                }
+            } else if(num2[0] == '(')
+            {
+                result = BracketOpener(num2, num1, operation);
+            }
+            return result;
+        }
         public bool IsOperation(char val)
         {
             bool is_val_operation = false;
@@ -217,7 +273,6 @@ namespace RPN_App.ReversePolishNote
             }
             return is_val_operation;
         }
-
         public float Operation(string o, float num1, float num2)
         {
             float result = 0;
@@ -243,6 +298,94 @@ namespace RPN_App.ReversePolishNote
                     break;
             }
             return result;
+        }
+
+        public Dictionary<string, int> getEquatationCoef(string line)
+        {
+            Dictionary<string, int> dict = new Dictionary<string, int>();
+            if (line.Contains("-"))
+            {
+                line = line.Replace("-", "+#");
+            }
+
+            string[] arr = line.Split('+');
+            if(arr != null && arr.Length > 0)
+            {
+                foreach(var str in arr)
+                {
+                    int pos = str.IndexOf('[');
+                    if (pos == 1)
+                    {
+                        bool t = dict.ContainsKey(str);
+                        if (t)
+                        {
+                            int res = dict[str];
+                            res++;
+                            dict[str] = res;
+                        } else
+                        {
+                            dict.Add(str, 1);
+                        }
+                    }
+                    else if (pos > 1)
+                    {
+                        string val = str.Substring(0, str.Length - pos - 3);
+                        if (val[0] == '#')
+                        {
+                            string num_val = "";
+                            for (int i = 0; i < val.Length; i++)
+                            {
+                                if (Char.IsDigit(val[i]))
+                                {
+                                    num_val += val[1];
+                                }
+                                if (num_val.Length == 0)
+                                {
+                                    val = "-1";
+                                }
+                                else
+                                {
+                                    val = "-" + num_val;
+                                }
+                            }
+                        }
+
+                        int coef = 0;
+                        bool t1 = int.TryParse(val, out coef);
+                        if(t1)
+                        {
+                            string key = str.Substring(pos - 1);
+                            bool t2 = dict.ContainsKey(key);
+                            if (t2)
+                            {
+                                int res = dict[key];
+                                res += coef;
+                                dict[key] = res;
+                            }
+                            else
+                            {
+                                dict.Add(key, coef);
+                            }
+                        } else
+                        {
+                            Console.WriteLine("Error while parsibng value: " + val);
+                        }
+                    }
+                    else
+                    {
+                        if (dict.ContainsKey(str))
+                        {
+                            int val = dict[str];
+                            dict[str] = val + 1;
+                        }
+                        else
+                        {
+                            dict.Add(str, 1);
+                        }
+                    }
+                }
+            }
+            return dict;
         }
     }
 }

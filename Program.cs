@@ -12,15 +12,15 @@ namespace RPN_App
             bool need_repeat = true;
             //while (need_repeat)
             {
-                string line0 = "i=1..2$1;"
-                             + "j=2..3$1;"
+                string line0 = "i=1..3$1;"
+                             + "j=1..2$1;"
                              + "k=3..4$1;"
                              + "c=1..4$1;";
                 Console.WriteLine("Index ranges: " + line0);
                 //string line1 = "a+b*c/((d-a)*i - b)^d"; 
                 //string line1 = "2+3*1/((5-8)*2 - 5)^2+E[i,j,k,p]y"; 
                 //string line1 = "E[k=k'..kmax](E[c](E[h](y[i,j,k,c,h]))+E[c](E[h](y[i,j,k,c,h]))) - M*(1-x[i,j,k,c,h])";
-                string line1 = "E[c](E[k](t[c,k] + f[c,k])) + 12*E[c]f[k,c]";
+                string line1 = "E[i](E[j](x[i,j])) - x[1,1]";// "E[i](E[j](t[i,j] + f[i,j])) + 7*(E[j](E[i](f[j,i] + t[i,j]))) + 67";
                 Console.WriteLine("Enter formula: " + line1);
                 //string line1 = Console.ReadLine(); 
                 if (!String.IsNullOrEmpty(line1))
@@ -41,6 +41,8 @@ namespace RPN_App
 
                     string lineariztion = rpn.LinearizeSumOfRPN(reverse_arr);
                     Console.WriteLine("Linearization: " + lineariztion);
+                    var dict = rpn.getEquatationCoef(lineariztion);
+                    CsvHelper.CsvManager.WriteDictToCsv(dict, "D:\\Education\\11 semestr\\ReversePolishNotation\\");
                     /*Console.WriteLine("\tStack: ");
                     for(int i = 0; i < reverse_arr.Length; i++)
                     {

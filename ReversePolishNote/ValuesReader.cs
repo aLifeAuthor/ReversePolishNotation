@@ -81,6 +81,7 @@ namespace RPN_App.ReversePolishNote
                     if (symb == '-')
                         sign = "_";
 
+
                     foreach (var index in list_ind)
                     {
                         ValueRange<int, int> range = FindRange(index);

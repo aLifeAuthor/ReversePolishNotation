@@ -153,5 +153,42 @@ namespace RPN_App.CsvHelper
             }
         }
 
+        public static void WriteDictToCsv(Dictionary<string, int> coefs, string path)
+        {
+            using var mem = new MemoryStream();
+            using var writer = new StreamWriter(mem);
+            using var csvWriter = new CsvWriter(writer, CultureInfo.CurrentCulture);
+
+            // creating header
+            foreach(var keypair in coefs)
+            {
+                csvWriter.WriteField(keypair.Key);
+            }
+            csvWriter.NextRecord();
+
+            // writing data to csv file
+            foreach (var keypair in coefs)
+            {
+                csvWriter.WriteField(keypair.Value);
+            }
+            csvWriter.NextRecord();
+
+            writer.Flush();
+            var byte_arr = mem.ToArray();
+            //var result = Encoding.UTF8.GetString(mem.ToArray());
+
+            // запись в файл
+            using (FileStream fstream = new FileStream($"{path}note.csv", FileMode.OpenOrCreate))
+            {
+                // преобразуем строку в байты
+                //byte[] array = System.Text.Encoding.Default.GetBytes(text);
+                // запись массива байтов в файл
+                fstream.Write(byte_arr, 0, byte_arr.Length);
+                Console.WriteLine("Текст записан в файл");
+            }
+
+            //Console.WriteLine(result);
+        }
+
     }
 }
